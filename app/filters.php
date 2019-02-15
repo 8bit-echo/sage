@@ -18,6 +18,11 @@ add_filter('body_class', function (array $classes) {
         $classes[] = 'sidebar-primary';
     }
 
+    /** Add class if Internet Explorer  */
+    if (is_ie()) {
+        $classes[] = 'internet-explorer';
+    }
+
     /** Clean up class names for custom templates */
     $classes = array_map(function ($class) {
         return preg_replace(['/-blade(-php)?$/', '/^page-template-views/'], '', $class);

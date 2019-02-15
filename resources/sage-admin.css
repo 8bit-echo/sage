@@ -1,0 +1,8 @@
+/* Let CPT UI take up full screen */
+div.wdspromos {
+  display: none;
+}
+
+.posttypesui {
+  width: 100%;
+}

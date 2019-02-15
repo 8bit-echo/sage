@@ -90,3 +90,7 @@ Container::getInstance()
             'view' => require dirname(__DIR__).'/config/view.php',
         ]);
     }, true);
+
+
+include __DIR__ . '/functions-vermilion.php';
+include __DIR__ . '/functions-app.php';

@@ -83,6 +83,8 @@ function filter_templates($templates)
 {
     $paths = apply_filters('sage/filter_templates/paths', [
         'views',
+        'views/singles',
+        'views/archives',
         'resources/views'
     ]);
     $paths_pattern = "#^(" . implode('|', $paths) . ")/#";

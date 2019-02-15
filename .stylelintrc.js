@@ -1,5 +1,6 @@
 module.exports = {
   'extends': 'stylelint-config-standard',
+  'defaultSeverity': "warning",
   'rules': {
     'no-empty-source': null,
     'string-quotes': 'double',

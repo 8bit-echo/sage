@@ -1,228 +1,253 @@
-'use strict'; // eslint-disable-line
-
+const path = require('path');
+const fs = require('fs');
 const webpack = require('webpack');
-const merge = require('webpack-merge');
-const CleanPlugin = require('clean-webpack-plugin');
+const MinifyPlugin = require('babel-minify-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+const BrowserSync = require('browser-sync-webpack-plugin');
+const SassPlugin = require('sass-webpack-plugin');
 const StyleLintPlugin = require('stylelint-webpack-plugin');
-const CopyGlobsPlugin = require('copy-globs-webpack-plugin');
-const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
+const project = require('./paths');
+const userConfig = require('../config.json');
 
-const desire = require('./util/desire');
-const config = require('./config');
+/**
+ * gets all the files in /src/js and maps them to their own entry objects for code splitting purposes.
+ * @param {string} type the type of asset to get 'scripts' || 'styles'
+ */
+function getEntryPoints(type) {
+  const entryPoints = type === 'scripts' ? {} : {};
+  const sourcePath = path.join(project.sourcePathBase, `${type}/`);
+  const fullSrcPath = sourcePath;
 
-const assetsFilenames = (config.enabled.cacheBusting) ? config.cacheBusting : '[name]';
+  const files = fs.readdirSync(fullSrcPath);
+  files.forEach((file) => {
+    if (file[0] === '.') {
+      return;
+    }
+    const stat = fs.statSync(`${fullSrcPath  }/${  file}`);
+    // ignore if partial file.
+    if (stat.isFile() && file.substr(0, 1) !== '_') {
+      const baseName = path.basename(file, path.extname(file));
 
-let webpackConfig = {
-  context: config.paths.assets,
-  entry: config.entry,
-  devtool: (config.enabled.sourceMaps ? '#source-map' : undefined),
+      switch (type) {
+        case 'scripts':
+          entryPoints[baseName] = `${project.sourcePathBase  }scripts/${  file}`;
+          break;
+
+        case 'styles':
+          entryPoints[`resources/assets/styles/${file}`] = `./styles/${file.replace('.scss', '.css')}`;
+          // entryPoints.push(`styles/${file.replace('scss', 'css')}`);
+          break;
+
+        default:
+          break;
+      }
+    }
+  });
+  return entryPoints;
+}
+
+/**
+ * Writes a plain text file to the dist folder to use as a query string for cache busting
+ *
+ */
+function EmitHash() {
+  this.options = {
+    outputPath: project.distBase,
+    outputFileName: 'webpack_hash',
+  };
+}
+
+EmitHash.prototype.apply = function (compiler) {
+  compiler.plugin(
+    'after-emit',
+    (compilation, callback) => {
+      const outputFile = path.join(this.options.outputPath, this.options.outputFileName);
+
+      fs.writeFileSync(outputFile, compilation.getStats().hash);
+
+      callback();
+
+      console.log('Writing hash file: ' + outputFile);
+    },
+  );
+};
+
+const config = {
+  entry: getEntryPoints('scripts'),
   output: {
-    path: config.paths.dist,
-    publicPath: config.publicPath,
-    filename: `scripts/${assetsFilenames}.js`,
+    publicPath: project.sourcePathBase,
+    filename: 'scripts/[name].js',
+    path: project.distBase,
   },
-  stats: {
-    hash: false,
-    version: false,
-    timings: false,
-    children: false,
-    errors: false,
-    errorDetails: false,
-    warnings: false,
-    chunks: false,
-    modules: false,
-    reasons: false,
-    source: false,
-    publicPath: false,
-  },
+
   module: {
     rules: [
+      // this allows glob pattern importing in scss and js files (eg: import ./autoload/**/*)
       {
         enforce: 'pre',
-        test: /\.js$/,
-        include: config.paths.assets,
-        use: 'eslint',
-      },
-      {
-        enforce: 'pre',
-        test: /\.(js|s?[ca]ss)$/,
-        include: config.paths.assets,
+        test: /\.([jt]s|s?[ca]ss)$/,
+        include: project.sourcePathBase,
         loader: 'import-glob',
       },
       {
-        test: /\.js$/,
-        exclude: [/node_modules(?![/|\\](bootstrap|foundation-sites))/],
-        use: [
-          { loader: 'cache' },
-          { loader: 'buble', options: { objectAssign: 'Object.assign' } },
-        ],
-      },
-      {
-        test: /\.css$/,
-        include: config.paths.assets,
+        test: /\.s?css$/,
         use: ExtractTextPlugin.extract({
-          fallback: 'style',
-          use: [
-            { loader: 'cache' },
-            { loader: 'css', options: { sourceMap: config.enabled.sourceMaps } },
-            {
-              loader: 'postcss', options: {
-                config: { path: __dirname, ctx: config },
-                sourceMap: config.enabled.sourceMaps,
-              },
+          use: [{
+            loader: 'css-loader',
+            options: {
+              // sourceMap: process.env.NODE_ENV !== 'production'
             },
+          },
+          {
+            loader: 'postcss-loader',
+            options: {
+              // sourceMap: process.env.NODE_ENV !== 'production'
+            },
+          },
+          {
+            loader: 'sass-loader',
+            options: {
+              // for making global.scss available in all files.
+              // data: '@import \'global\'',
+              include: path.resolve(`${project.sourcePathBasestyles}styles/`),
+              // sourceMap: process.env.NODE_ENV !== 'production'
+            },
+          },
           ],
         }),
       },
       {
-        test: /\.scss$/,
-        include: config.paths.assets,
-        use: ExtractTextPlugin.extract({
-          fallback: 'style',
-          use: [
-            { loader: 'cache' },
-            { loader: 'css', options: { sourceMap: config.enabled.sourceMaps } },
-            {
-              loader: 'postcss', options: {
-                config: { path: __dirname, ctx: config },
-                sourceMap: config.enabled.sourceMaps,
-              },
-            },
-            { loader: 'resolve-url', options: { sourceMap: config.enabled.sourceMaps } },
-            {
-              loader: 'sass', options: {
-                sourceMap: config.enabled.sourceMaps,
-                sourceComments: true,
-              },
-            },
-          ],
-        }),
+        test: /\.jsx?$/,
+        // supports writing in es 6, 2017 styles.
+        exclude: /node_modules/,
+        loader: 'babel-loader',
       },
       {
-        test: /\.(ttf|otf|eot|woff2?|png|jpe?g|gif|svg|ico)$/,
-        include: config.paths.assets,
-        loader: 'url',
+        test: /\.tsx?/,
+        exclude: '/node_modules/',
+        loader: 'ts-loader',
+      },
+      {
+        test: /\.vue$/,
+        loader: 'vue-loader',
         options: {
-          limit: 4096,
-          name: `[path]${assetsFilenames}.[ext]`,
+          loaders: {
+            scss: ['vue-style-loader', 'css-loader', 'sass-loader'],
+          },
+          // other vue-loader options go here
         },
       },
       {
-        test: /\.(ttf|otf|eot|woff2?|png|jpe?g|gif|svg|ico)$/,
-        include: /node_modules/,
-        loader: 'url',
+        test: /\.(png|jpe?g|gif|svg|ico)(\?.*)?$/,
+        loader: 'url-loader',
         options: {
-          limit: 4096,
-          outputPath: 'vendor/',
-          name: `${config.cacheBusting}.[ext]`,
+          limit: 10000,
+          name: 'images/[name].[ext]',
+        },
+      },
+      {
+        test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/,
+        loader: 'url-loader',
+        options: {
+          limit: 10000,
+          name: 'media/[name].[ext]',
+        },
+      },
+      {
+        test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
+        loader: 'url-loader',
+        options: {
+          limit: 10000,
+          name: 'fonts/[name].[ext]',
         },
       },
     ],
   },
   resolve: {
-    modules: [
-      config.paths.assets,
-      'node_modules',
-    ],
-    enforceExtension: false,
+    alias: {
+      vue$: 'vue/dist/vue.esm.js',
+    },
+    extensions: ['*', '.js', '.vue', '.json', '.ts'],
   },
-  resolveLoader: {
-    moduleExtensions: ['-loader'],
-  },
-  externals: {
-    jquery: 'jQuery',
-  },
+  // Source maps with line numbers only
+  devtool: '#cheap-module-eval-source-map',
+
   plugins: [
-    new CleanPlugin([config.paths.dist], {
-      root: config.paths.root,
-      verbose: false,
-    }),
-    /**
-     * It would be nice to switch to copy-webpack-plugin, but
-     * unfortunately it doesn't provide a reliable way of
-     * tracking the before/after file names
-     */
-    new CopyGlobsPlugin({
-      pattern: config.copy,
-      output: `[path]${assetsFilenames}.[ext]`,
-      manifest: config.manifest,
-    }),
-    new ExtractTextPlugin({
-      filename: `styles/${assetsFilenames}.css`,
-      allChunks: true,
-      disable: (config.enabled.watcher),
-    }),
-    new webpack.ProvidePlugin({
-      $: 'jquery',
-      jQuery: 'jquery',
-      'window.jQuery': 'jquery',
-      Popper: 'popper.js/dist/umd/popper.js',
-    }),
-    new webpack.LoaderOptionsPlugin({
-      minimize: config.enabled.optimize,
-      debug: config.enabled.watcher,
-      stats: { colors: true },
-    }),
-    new webpack.LoaderOptionsPlugin({
-      test: /\.s?css$/,
-      options: {
-        output: { path: config.paths.dist },
-        context: config.paths.assets,
+    // this is for postcss-loader
+    require('autoprefixer'),
+
+    // extract multiple css files.
+    new SassPlugin(getEntryPoints('styles'), {
+      sourceMap: process.env.NODE_ENV !== 'production',
+      sass: {
+        outputStyle: 'compressed',
       },
+      autoprefixer: true,
     }),
-    new webpack.LoaderOptionsPlugin({
-      test: /\.js$/,
-      options: {
-        eslint: { failOnWarning: false, failOnError: true },
-      },
-    }),
+
     new StyleLintPlugin({
-      failOnError: !config.enabled.watcher,
+      failOnError: false,
       syntax: 'scss',
     }),
-    new FriendlyErrorsWebpackPlugin(),
+
+
+    // // required for scss -> css compilation within vue templates. maybe dont need this anymore.
+    // new ExtractTextPlugin({
+    //   filename: '[name].css',
+    //   allChunks: false,
+    //   publicPath: project.sourcePathBase,
+    // })
+
+
+    // register variables or scripts globally. ()
+    // new webpack.ProvidePlugin({
+    //   $: 'jquery',
+    //   jQuery: 'jquery',
+    //   'window.$': 'jquery',
+    //   'window.jQuery': 'jquery',
+    // }),
+    // live reload of webpages on change.
+    new EmitHash(),
+    // use this to exclude packages from being included.
+    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
   ],
 };
 
-/* eslint-disable global-require */ /** Let's only load dependencies as needed */
-
-if (config.enabled.optimize) {
-  webpackConfig = merge(webpackConfig, require('./webpack.config.optimize'));
+if (userConfig.useBrowserSync) {
+  config.plugins.push(
+    new BrowserSync({
+      open: false,
+      proxy: userConfig.devUrl,
+      files: userConfig.watchGlobs,
+      injectChanges: true,
+      reloadDelay: 0,
+      notify: false,
+      https: {
+        key: '/usr/local/etc/httpd/ssl/server.key',
+        cert: '/usr/local/etc/httpd/ssl/server.crt',
+      },
+    }) 
+);
 }
 
-if (config.env.production) {
-  webpackConfig.plugins.push(new webpack.NoEmitOnErrorsPlugin());
-}
-
-if (config.enabled.cacheBusting) {
-  const WebpackAssetsManifest = require('webpack-assets-manifest');
-
-  webpackConfig.plugins.push(
-    new WebpackAssetsManifest({
-      output: 'assets.json',
-      space: 2,
-      writeToDisk: false,
-      assets: config.manifest,
-      replacer: require('./util/assetManifestsFormatter'),
-    })
+// Change options for Production
+if (process.env.NODE_ENV === 'production') {
+  console.log('> Building for production...');
+  config.plugins.push(
+    // js minification
+    new MinifyPlugin(),
+    // css minification
+    new OptimizeCssAssetsPlugin(),
+    // vue / react production mode
+    new webpack.DefinePlugin({
+      'process.env': {
+        NODE_ENV: '"production"',
+      },
+    }),
   );
+  // source maps
+  delete config.devtool;
 }
 
-if (config.enabled.watcher) {
-  webpackConfig.entry = require('./util/addHotMiddleware')(webpackConfig.entry);
-  webpackConfig = merge(webpackConfig, require('./webpack.config.watch'));
-}
-
-/**
- * During installation via sage-installer (i.e. composer create-project) some
- * presets may generate a preset specific config (webpack.config.preset.js) to
- * override some of the default options set here. We use webpack-merge to merge
- * them in. If you need to modify Sage's default webpack config, we recommend
- * that you modify this file directly, instead of creating your own preset
- * file, as there are limitations to using webpack-merge which can hinder your
- * ability to change certain options.
- */
-module.exports = merge.smartStrategy({
-  'module.loaders': 'replace',
-})(webpackConfig, desire(`${__dirname}/webpack.config.preset`));
+module.exports = config;

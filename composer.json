@@ -1,9 +1,8 @@
 {
-  "name": "roots/sage",
+  "name": "vermiliondesign/sage",
   "type": "wordpress-theme",
   "license": "MIT",
   "description": "WordPress starter theme with a modern development workflow",
-  "homepage": "https://roots.io/sage/",
   "authors": [
     {
       "name": "Ben Word",
@@ -19,11 +18,16 @@
       "name": "QWp6t",
       "email": "hi@qwp6t.me",
       "homepage": "https://github.com/qwp6t"
+    },
+    {
+      "name": "Matt Dickey",
+      "email": "mattdickey@vermilion.com",
+      "homepage": "https://github.com/8bit-echo"
     }
   ],
-  "keywords": ["wordpress"],
+  "keywords": ["wordpress", "vermilion", "sage"],
   "support": {
-    "issues": "https://github.com/roots/sage/issues",
+    "issues": "https://github.com/vermiliondesign/sage/issues",
     "forum": "https://discourse.roots.io/"
   },
   "autoload": {
@@ -40,10 +44,9 @@
   },
   "require-dev": {
     "squizlabs/php_codesniffer": "^2.8.0",
-    "roots/sage-installer": "~1.6"
+    "vermiliondesign/sage-installer": "~1.6"
   },
   "scripts": {
-    "test": ["phpcs"],
     "post-create-project-cmd": [
       "Roots\\Sage\\Installer\\ComposerScript::postCreateProject"
     ]

@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use Sober\Controller\Controller;
+use \App\Classes\AppOption;
 
 class App extends Controller
 {
@@ -29,5 +30,12 @@ class App extends Controller
             return __('Not Found', 'sage');
         }
         return get_the_title();
+    }
+
+    public static function option($key)
+    {
+        $theme = new AppOption();
+        $options = $theme::getInstance();
+        return array_key_exists($key, $options) ? $options[$key] : false;
     }
 }
