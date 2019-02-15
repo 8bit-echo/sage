@@ -48,7 +48,7 @@
   },
   "scripts": {
     "post-create-project-cmd": [
-      "Roots\\Sage\\Installer\\ComposerScript::postCreateProject"
+      "Vermilion\\Sage\\Installer\\ComposerScript::postCreateProject"
     ]
   }
 }
