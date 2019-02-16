@@ -44,11 +44,11 @@
   },
   "require-dev": {
     "squizlabs/php_codesniffer": "^2.8.0",
-    "vermiliondesign/sage-installer": "~1.6"
+    "vermiliondesign/sage-installer": "~2.0"
   },
   "scripts": {
     "post-create-project-cmd": [
-      "Roots\\Sage\\Installer\\ComposerScript::postCreateProject"
+      "VermilionDesign\\Sage\\Installer\\ComposerScript::postCreateProject"
     ]
   }
 }
