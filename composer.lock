@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "ebb43fc8b33e6d7b48997d3d0929c339",
+    "content-hash": "3c77557d021ceb79adf5d5640601d71f",
     "packages": [
         {
             "name": "brain/hierarchy",
@@ -1625,16 +1625,16 @@
         },
         {
             "name": "vermiliondesign/sage-installer",
-            "version": "1.6.2",
+            "version": "2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vermiliondesign/sage-installer.git",
-                "reference": "bff412234f9852a73d3c2f2e49bfb959f7f732e8"
+                "reference": "063140eb6904b7d20cef1d1653b08f2fce6bb996"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vermiliondesign/sage-installer/zipball/bff412234f9852a73d3c2f2e49bfb959f7f732e8",
-                "reference": "bff412234f9852a73d3c2f2e49bfb959f7f732e8",
+                "url": "https://api.github.com/repos/vermiliondesign/sage-installer/zipball/063140eb6904b7d20cef1d1653b08f2fce6bb996",
+                "reference": "063140eb6904b7d20cef1d1653b08f2fce6bb996",
                 "shasum": ""
             },
             "require": {
@@ -1652,7 +1652,7 @@
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "Roots\\Sage\\Installer\\": "src/"
+                    "VermilionDesign\\Sage\\Installer\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -1669,9 +1669,14 @@
                     "name": "QWp6t",
                     "email": "hi@qwp6t.me",
                     "homepage": "https://github.com/qwp6t"
+                },
+                {
+                    "name": "Matt Dickey",
+                    "email": "mattdickey@vermilion.com",
+                    "homepage": "https://github.com/8bit-echo"
                 }
             ],
-            "description": "Sage starter theme installer",
+            "description": "Vermilion Fork of Sage starter theme installer",
             "keywords": [
                 "bootstrap",
                 "foundation",
@@ -1681,7 +1686,7 @@
                 "theme",
                 "wordpress"
             ],
-            "time": "2019-02-14T01:13:25+00:00"
+            "time": "2019-02-16T06:25:24+00:00"
         }
     ],
     "aliases": [],
