@@ -14,22 +14,29 @@ class App extends Controller
 
     public static function title()
     {
+        $title = '';
+
+        if (WP_ENV === 'development') {
+            $title .= 'LOCAL: ';
+        }
         if (is_home()) {
             if ($home = get_option('page_for_posts', true)) {
-                return get_the_title($home);
+                $title .= get_the_title($home);
             }
-            return __('Latest Posts', 'sage');
+            $title .= __('Latest Posts', 'sage');
         }
         if (is_archive()) {
-            return get_the_archive_title();
+            $title .= get_the_archive_title();
         }
         if (is_search()) {
-            return sprintf(__('Search Results for %s', 'sage'), get_search_query());
+            $title .= sprintf(__('Search Results for %s', 'sage'), get_search_query());
         }
         if (is_404()) {
-            return __('Not Found', 'sage');
+            $title .= __('Not Found', 'sage');
         }
-        return get_the_title();
+        $title .= get_the_title();
+
+        return $title;
     }
 
     public static function option($key)
