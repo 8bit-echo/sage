@@ -1,14 +1,22 @@
 <?php
 use App\Classes\AppOption;
+use App\Classes\API;
 
 new AppOption();
 
-/*========================*/
-/*   Define Functions     */
-/*========================*/
+/*==========================*/
+/*  Define Functions (A-Z)  */
+/*==========================*/
+
+/** Allow uploads of SVGs to the media library */
+function allow_svg_upload($mimes) {
+  $mimes['svg'] = 'image/svg+xml';
+
+  return $mimes;
+}
+
 /** Remove non-essential items from the WP Admin bar  */
-function clean_admin_bar()
-{
+function clean_admin_bar() {
   global $wp_admin_bar;
   $wp_admin_bar->remove_menu('wp-logo');
     // $wp_admin_bar->remove_menu('customize');
@@ -18,24 +26,8 @@ function clean_admin_bar()
   $wp_admin_bar->remove_menu('wpseo-menu');
 }
 
-/** Global custom stylesheet for WP back-end. */
-function get_sage_admin_styles()
-{
-  wp_register_style('sage-admin-styles', get_theme_file_uri() . '/resources/sage-admin.css');
-  wp_enqueue_style('sage-admin-styles');
-}
-
-/** Allow uploads of SVGs to the media library */
-function allow_svg_upload($mimes)
-{
-  $mimes['svg'] = 'image/svg+xml';
-
-  return $mimes;
-}
-
 /** fixes improper display of svg thumbnails in media library */
-function fix_svg_thumb_display()
-{
+function fix_svg_thumb_display() {
   echo '<style>
     td.media-icon img[src$=".svg"], img[src$=".svg"].attachment-post-thumbnail { 
         width: 100% !important; 
@@ -44,18 +36,31 @@ function fix_svg_thumb_display()
     </style>';
 }
 
+/** Global custom stylesheet for WP back-end. */
+function get_sage_admin_styles() {
+  wp_register_style('sage-admin-styles', get_theme_file_uri() . '/resources/sage-admin.css');
+  wp_enqueue_style('sage-admin-styles');
+}
+
+/** modify rest responses from app/Classes/API.php */
+function init_rest_api_extensions() {
+  if (class_exists('\App\Classes\API')) {
+    new API();
+  }
+}
+
+/** Browser detection function for Last 3 Versions of IE */
+function is_ie() {
+  return boolval(strpos($_SERVER['HTTP_USER_AGENT'], 'Trident/') !== false);
+}
+
 /** Hide pages for CPTUI and ACF if the user isn't privileged. */
-function remove_menu_items_from_admin()
-{
+function remove_menu_items_from_admin() {
   remove_menu_page('cptui_main_menu');
   remove_menu_page('edit.php?post_type=acf-field-group');
 }
 
-/** Browser detection function for Last 3 Versions of IE */
-function is_ie()
-{
-  return boolval(strpos($_SERVER['HTTP_USER_AGENT'], 'Trident/') !== false);
-}
+
 
 
 /*============================*/
@@ -77,6 +82,7 @@ if (is_admin()) {
 
 add_action('wp_before_admin_bar_render', 'clean_admin_bar');
 add_action('admin_head', 'fix_svg_thumb_display');
+add_action('rest_api_init', 'init_rest_api_extensions');
 
 
 /*===========================*/
