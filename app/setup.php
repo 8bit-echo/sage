@@ -7,14 +7,18 @@ use Roots\Sage\Assets\JsonManifest;
 use Roots\Sage\Template\Blade;
 use Roots\Sage\Template\BladeProvider;
 
-define('THEME_VERSION', file_get_contents(realpath(__DIR__ . '/../dist/webpack_hash')));
+define('THEME_VERSION', 
+    file_exists(realpath(__DIR__ . '/../dist/webpack_hash')) 
+    ? file_get_contents(realpath(__DIR__ . '/../dist/webpack_hash'))
+    : date('Ymj')
+);
 
 /**
  * Theme assets
  */
 add_action('wp_enqueue_scripts', function () {
     wp_enqueue_style('sage/main.css', asset_path('styles/main.css'), false, THEME_VERSION);
-    wp_enqueue_script('sage/main.js', asset_path('scripts/main.js'), ['jquery'], null, THEME_VERSION);
+    wp_enqueue_script('sage/main.js', asset_path('scripts/main.js'), [], THEME_VERSION, true );
 
     if (is_single() && comments_open() && get_option('thread_comments')) {
         wp_enqueue_script('comment-reply');
@@ -48,7 +52,8 @@ add_action('after_setup_theme', function () {
     register_nav_menus([
         'primary_navigation' => __('Primary Navigation', 'sage'),
         'utility_navigation' => __('Utility Navigation', 'sage'),
-        'footer_navigation'  => __('Sidebar Navigation', 'sage'),
+        'footer_navigation'  => __('Footer Navigation', 'sage'),
+        'sidebar_navigation'  => __('Sidebar Navigation', 'sage'),
     ]);
 
     /**

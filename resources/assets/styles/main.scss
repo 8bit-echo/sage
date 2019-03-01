@@ -1,7 +1,6 @@
 @import "common/variables";
 
 /** Import everything from autoload */
-@import "./autoload/**/*";
 
 /**
  * Import npm dependencies
@@ -13,6 +12,7 @@
 
 /** Import theme styles */
 @import "common/global";
+@import "components/navigation";
 @import "components/buttons";
 @import "components/comments";
 @import "components/forms";

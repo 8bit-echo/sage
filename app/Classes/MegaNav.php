@@ -7,7 +7,8 @@ use Walker_Nav_Menu;
 class MegaNav extends Walker_Nav_Menu
 {
 
-  protected $top_level_item_img_desc;
+  protected $top_level_item_img_desc = '';
+  private $use_left_right_container =  false;
 
   /**
    * "Start Element". Generally, this method is used to add the opening HTML tag for a single tree item (such as <li>, <span>, or <a>) to $output.
@@ -17,19 +18,20 @@ class MegaNav extends Walker_Nav_Menu
     $output .= "<!--start_el: " . $depth . "-->";
     if ($depth === 0) {
       $classes = [];
+      $classes[] = in_array('current_page_item', $item->classes) ? 'active' : null;
       $classes[] = $args->walker->has_children ? 'has-children' : '';
       $output .= '<li class="menu-item ' . implode(' ', $classes) . '"><a href="' . $item->url . '">' . $item->title . '</a>';
 
         // we'll need the image and the parent description later, but we can't use it where we need to yet. 
-      $this->top_level_item_img_desc = '
-          <img src="' . get_the_post_thumbnail_url($item->object_id) . '" alt="' . $item->title . '">
-          <div class="description-wrapper">
-             <p class="description">' . $item->description . '</p>' .
-        '<div class="cta-wrapper">
-                 <a class="cta btn-simple" href="' . $item->url . '">Explore</a>
-               </div>
-           </div>
-        ';
+      // $this->top_level_item_img_desc = '
+      //     <img src="' . get_the_post_thumbnail_url($item->object_id) . '" alt="' . $item->title . '">
+      //     <div class="description-wrapper">
+      //        <p class="description">' . $item->description . '</p>' .
+      //   '<div class="cta-wrapper">
+      //            <a class="cta btn-simple" href="' . $item->url . '">Explore</a>
+      //          </div>
+      //      </div>
+      //   ';
     }
 
 
@@ -56,17 +58,21 @@ class MegaNav extends Walker_Nav_Menu
     if ($depth === 0) {
       $output .=
         '<div class="dropdown-wrapper">
-        <div class="dropdown-inner">
-          
-            <div class="left">
-               <!-- left-content -->
-            </div>
+        <div class="dropdown-inner">';
 
-            <div class="right">
-                 <!-- right-content -->
+        if ($this->use_left_right_container) {
+           $output .= '
+           <div class="left">
+              <!-- left-content -->
+            </div>
+          ';
+        }
+
+        $output.=
+          '<div class="right">
+            <!-- right-content -->
             <div class="submenu-wrapper">
-              <ul class="submenu">
-           ';
+              <ul class="submenu">';
         // these elements get closed in end_lvl();
     }
 
@@ -85,9 +91,10 @@ class MegaNav extends Walker_Nav_Menu
   {
     $output .= '</li>';
     if ($depth === 0) {
-
+      if ($this->use_left_right_container) { 
         // this is the part where we inject the featured image and description into the output.
-      $output = str_replace('<!-- left-content -->', $this->top_level_item_img_desc, $output);
+        $output = str_replace('<!-- left-content -->', $this->top_level_item_img_desc, $output);
+      }
     }
 
     $output .= "<!--end_el: " . $depth . "-->";
