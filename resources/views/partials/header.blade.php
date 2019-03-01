@@ -6,6 +6,7 @@
     {{the_custom_logo()}}
     
     <nav class="site-navigation">
+      <button class="mobile-only mobile-nav-toggle" id="mobile-nav-toggle">&#9776;</button>
       @if (has_nav_menu('utility_navigation'))
             {!! wp_nav_menu([ 
               'theme_location' => 'utility_navigation', 

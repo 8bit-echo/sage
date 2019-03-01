@@ -13,12 +13,28 @@ body {
 .lazy {
   -webkit-transition: opacity 250ms ease-in-out;
   -moz-transition: opacity 250ms ease-in-out;
-  -o-transition: opacity 250ms ease-in-out;
+  -o-transition: opacity 200ms ease-in-out;
   transition: opacity 250ms ease-in-out;
   max-width: 100%;
   opacity: 0;
 
   &.b-loaded {
     opacity: 1;
+  }
+}
+
+.mobile-only {
+  display: initial;
+
+  @media screen and (min-width: 768px) {
+    display: none !important;
+  }
+}
+
+.desktop-only {
+  display: none;
+
+  @media screen and (min-width: 768px) {
+    display: initial !important;
   }
 }
