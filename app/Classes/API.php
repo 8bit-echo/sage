@@ -78,8 +78,10 @@ class API
   private static function addFeaturedMedia() {
     foreach (self::getPostTypes() as $post_type) {
       register_rest_field($post_type, 'featured_media_url', [
-        'get_callback' => function ($post) use ($post_type) {
-          return get_the_post_thumbnail_url($post->ID);
+        'get_callback' => function ($post) {
+          if ($post instanceof WP_POST) {
+            return get_the_post_thumbnail_url($post->ID);
+          }
         },
       ]);
     }

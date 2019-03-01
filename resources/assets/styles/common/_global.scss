@@ -9,3 +9,16 @@ body {
 *::after {
   box-sizing: border-box;
 }
+
+.lazy {
+  -webkit-transition: opacity 250ms ease-in-out;
+  -moz-transition: opacity 250ms ease-in-out;
+  -o-transition: opacity 250ms ease-in-out;
+  transition: opacity 250ms ease-in-out;
+  max-width: 100%;
+  opacity: 0;
+
+  &.b-loaded {
+    opacity: 1;
+  }
+}

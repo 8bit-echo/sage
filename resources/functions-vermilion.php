@@ -54,6 +54,22 @@ function is_ie() {
   return boolval(strpos($_SERVER['HTTP_USER_AGENT'], 'Trident/') !== false);
 }
 
+/**
+ * Change all image src from editor to be compatible with blazy lazy-loader
+ */ 
+function lazy_load_editor_images($content) {
+	//-- Change src/srcset to data attributes.
+	$content = preg_replace("/<img(.*?)(src=|srcset=)(.*?)>/i", '<img$1data-$2$3>', $content);
+
+	//-- Add .lazy-load class to each image that already has a class.
+	$content = preg_replace('/<img(.*?)class=\"(.*?)\"(.*?)>/i', '<img$1class="$2 lazy"$3>', $content);
+
+	//-- Add .lazy-load class to each image that doesn't already have a class.
+	$content = preg_replace('/<img((.(?!class=))*)\/?>/i', '<img class="lazy"$1>', $content);
+	
+  return $content;
+}
+
 /** Hide pages for CPTUI and ACF if the user isn't privileged. */
 function remove_menu_items_from_admin() {
   remove_menu_page('cptui_main_menu');
@@ -90,3 +106,4 @@ add_action('rest_api_init', 'init_rest_api_extensions');
 /*===========================*/
 
 add_filter('upload_mimes', 'allow_svg_upload');
+add_filter('the_content' , 'lazy_load_editor_images');

@@ -32,6 +32,10 @@ class App extends Controller
         return get_the_title();
     }
 
+    public function placeholderImg() {
+        return 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+    }
+
     public static function option($key)
     {
         $theme = new AppOption();
