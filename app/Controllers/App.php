@@ -38,4 +38,20 @@ class App extends Controller
         $options = $theme::getInstance();
         return array_key_exists($key, $options) ? $options[$key] : false;
     }
+
+    public static function copyrightYears() {
+        // est. 2019
+        $year_string = '2019';
+        $year_string .= date('Y') > 2019 ? '-' . date('Y') : null;
+    
+        return $year_string;
+      }
+    
+      public static function paginationArgs() {
+        return [
+          'mid_size' => 3,
+          'prev_text' => '&laquo;',
+          'next_text' => '&raquo;'
+        ];
+      }
 }

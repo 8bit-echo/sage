@@ -1,6 +1,6 @@
 {
   "useBrowserSync": false,
-  "publicPath": "/wp-content/themes/{theme-name}",
+  "publicPath": "/app/themes/{theme-name}",
   "devUrl": "https://{your-local-url-here}",
   "sslKeyPath": "/usr/local/etc/httpd/ssl/server.key",
   "sslCertPath": "'/usr/local/etc/httpd/ssl/server.crt",

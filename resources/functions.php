@@ -92,5 +92,5 @@ Container::getInstance()
     }, true);
 
 
-include __DIR__ . '/functions-vermilion.php';
+include __DIR__ . '/functions-default.php';
 include __DIR__ . '/functions-app.php';

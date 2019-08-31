@@ -17,6 +17,7 @@ class MegaNav extends Walker_Nav_Menu
     $output .= "<!--start_el: " . $depth . "-->";
     if ($depth === 0) {
       $classes = [];
+      $classes[] = in_array('current-menu-item', $item->classes) ? 'active' : null;
       $classes[] = $args->walker->has_children ? 'has-children' : '';
       $output .= '<li class="menu-item ' . implode(' ', $classes) . '"><a href="' . $item->url . '">' . $item->title . '</a>';
 
