@@ -1,5 +1,5 @@
 {
-  "name": "vermiliondesign/sage",
+  "name": "8bit-echo/sage",
   "type": "wordpress-theme",
   "license": "MIT",
   "description": "WordPress starter theme with a modern development workflow",
@@ -21,11 +21,11 @@
     },
     {
       "name": "Matt Dickey",
-      "email": "mattdickey@vermilion.com",
+      "email": "hello@8bit-echo.com",
       "homepage": "https://github.com/8bit-echo"
     }
   ],
-  "keywords": ["wordpress", "vermilion", "sage"],
+  "keywords": ["wordpress", "sage"],
   "support": {
     "issues": "https://github.com/vermiliondesign/sage/issues",
     "forum": "https://discourse.roots.io/"
