@@ -12,14 +12,9 @@ module.exports = {
     'jquery': true,
   },
   'parserOptions': {
-    'ecmaFeatures': {
-      'globalReturn': true,
-      'generators': false,
-      'objectLiteralDuplicateProperties': false,
-      'experimentalObjectRestSpread': true,
-    },
-    'ecmaVersion': 2017,
+    'ecmaVersion': 2018,
     'sourceType': 'module',
+    'parser': 'babel-eslint'
   },
   'plugins': [
     'import',
@@ -32,5 +27,20 @@ module.exports = {
       '\\.(coffee|scss|css|less|hbs|svg|json)$',
     ],
   },
-  'rules': {},
+  'rules': {
+    "arrow-parens": 0,
+    "import/no-named-as-default": 0,
+    "import/no-named-as-default-member": 0,
+    "lines-between-class-members": 0,
+    "no-console": 0,
+    "quotes": ["error", "single"],
+    "no-restricted-syntax": 0,
+    "radix": 0,
+    "no-param-reassign": 0,
+    "no-prototype-builtins": 0,
+    "operator-linebreak": 0,
+    "no-unused-vars": 'warn',
+    "array-callback-return": 0,
+    "no-underscore-dangle": 0
+  },
 };

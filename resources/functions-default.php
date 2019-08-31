@@ -3,20 +3,14 @@ use App\Classes\AppOption;
 use App\Classes\API;
 
 new AppOption();
+new API();
 
-/*==========================*/
-/*  Define Functions (A-Z)  */
-/*==========================*/
-
-/** Allow uploads of SVGs to the media library */
-function allow_svg_upload($mimes) {
-  $mimes['svg'] = 'image/svg+xml';
-
-  return $mimes;
-}
-
+/*========================*/
+/*   Define Functions     */
+/*========================*/
 /** Remove non-essential items from the WP Admin bar  */
-function clean_admin_bar() {
+function clean_admin_bar()
+{
   global $wp_admin_bar;
   $wp_admin_bar->remove_menu('wp-logo');
     // $wp_admin_bar->remove_menu('customize');
@@ -26,32 +20,34 @@ function clean_admin_bar() {
   $wp_admin_bar->remove_menu('wpseo-menu');
 }
 
-/** fixes improper display of svg thumbnails in media library */
-function fix_svg_thumb_display() {
-  echo '<style>
-    td.media-icon img[src$=".svg"], img[src$=".svg"].attachment-post-thumbnail { 
-        width: 100% !important; 
-        height: auto !important; 
-    }
-    </style>';
-}
-
 /** Global custom stylesheet for WP back-end. */
-function get_sage_admin_styles() {
+function get_sage_admin_styles()
+{
   wp_register_style('sage-admin-styles', get_theme_file_uri() . '/resources/sage-admin.css');
   wp_enqueue_style('sage-admin-styles');
 }
 
-/** modify rest responses from app/Classes/API.php */
-function init_rest_api_extensions() {
-  if (class_exists('\App\Classes\API')) {
-    new API();
-  }
+/** Hide pages for CPTUI and ACF if the user isn't privileged. */
+function remove_menu_items_from_admin()
+{
+  remove_menu_page('cptui_main_menu');
+  remove_menu_page('edit.php?post_type=acf-field-group');
 }
 
 /** Browser detection function for Last 3 Versions of IE */
-function is_ie() {
+function is_ie()
+{
   return boolval(strpos($_SERVER['HTTP_USER_AGENT'], 'Trident/') !== false);
+}
+
+// Fix ACF Previews
+function add_field_debug_preview($fields){
+   $fields["debug_preview"] = "debug_preview";
+   return $fields;
+}
+
+function add_input_debug_preview() {
+   echo '<input type="hidden" name="debug_preview" value="debug_preview">';
 }
 
 /**
@@ -70,13 +66,35 @@ function lazy_load_editor_images($content) {
   return $content;
 }
 
-/** Hide pages for CPTUI and ACF if the user isn't privileged. */
-function remove_menu_items_from_admin() {
-  remove_menu_page('cptui_main_menu');
-  remove_menu_page('edit.php?post_type=acf-field-group');
+add_theme_support('align-wide');
+add_theme_support('disable-custom-colors');
+add_theme_support('editor-color-palette', [ 
+  [
+    'name'    => 'White', 
+    'slug'    => 'white', 
+    'color'   => '##fff',
+  ],
+
+  [
+    'name'    => 'Grey', 
+    'slug'    => 'grey-light', 
+    'color'   => '#fefefe',
+  ],
+]);
+
+// debugging messages
+function registerWhoops() {
+  $whoops = new \Whoops\Run;
+  $whoops->pushHandler(new \Whoops\Handler\PrettyPageHandler);
+  $whoops->register();
 }
+if( WP_DEBUG && env('WP_ENV') === 'development' ) registerWhoops();
 
-
+function remove_jquery_from_frontend() {
+  if (!is_admin()) {
+    wp_deregister_script('jquery'); // De-Register jQuery
+  }
+}
 
 
 /*============================*/
@@ -95,15 +113,12 @@ if (is_admin()) {
 /*===========================*/
 /*          Actions          */
 /*===========================*/
-
 add_action('wp_before_admin_bar_render', 'clean_admin_bar');
-add_action('admin_head', 'fix_svg_thumb_display');
-add_action('rest_api_init', 'init_rest_api_extensions');
+add_action( 'edit_form_after_title', 'add_input_debug_preview' );
 
 
 /*===========================*/
 /*          Filters          */
 /*===========================*/
-
-add_filter('upload_mimes', 'allow_svg_upload');
 add_filter('the_content' , 'lazy_load_editor_images');
+add_filter('_wp_post_revision_fields', 'add_field_debug_preview');

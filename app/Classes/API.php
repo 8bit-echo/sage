@@ -2,12 +2,15 @@
 
 namespace App\Classes;
 
+use Symfony\Component\Console\Helper\Dumper;
+
 class API
 {
 
   function __construct() {
     $this->addTaxonomies();
     $this->addFeaturedMedia();
+    $this->addCustomFields();
   }
 
   /**
@@ -62,12 +65,16 @@ class API
         'terms' => []
       ];
 
-      $schema[$tax->name]['terms'] = array_map(
-        function ($term) {
-          return $term->name;
-        },
-        get_the_terms($post->ID, $tax->name)
-      );
+      $terms = get_the_terms($post['id'], $tax->name);
+
+      if (is_array($terms)) {
+        $schema[$tax->name]['terms'] = array_map(
+          function ($term) {
+            return $term->name;
+          },
+          $terms
+        );
+      }
     }
     return $schema;
   }
@@ -75,7 +82,7 @@ class API
   /**
    * Add featured media URL to REST API response
    */ 
-  private static function addFeaturedMedia() {
+  private function addFeaturedMedia() {
     foreach (self::getPostTypes() as $post_type) {
       register_rest_field($post_type, 'featured_media_url', [
         'get_callback' => function ($post) {
@@ -86,5 +93,26 @@ class API
       ]);
     }
   }
+
+  /**
+   * Add all ACF fields to each post type
+   * @return Fields?
+   * @return false
+   */ 
+  private function addCustomFields() {
+    if (function_exists('get_fields')) { 
+      foreach (self::getPostTypes() as $post_type) {
+        register_rest_field($post_type, 'fields', [
+          'get_callback' => function ($post) {
+            if (is_object($post)) {
+              return get_fields($post->id);
+            }
+          },
+        ]);
+      }
+    }
+  }
+
+  
 }
 

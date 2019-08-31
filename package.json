@@ -1,10 +1,10 @@
 {
-  "name": "vermilion-sage",
+  "name": "8bit-echo-sage",
   "version": "1.0.0",
-  "description": "a faster front-end task runner for the Vermilion flavored Sage 9 theme",
+  "description": "a faster, more robust front-end task runner for the Sage 9 theme",
   "main": "build/webpack.config.js",
-  "repository": "https://github.com/vermiliondesign/sage",
-  "author": "8bit-echo <mattdickey@vermilion.com>",
+  "repository": "https://github.com/8bit-echo/sage",
+  "author": "8bit-echo <hello@8bit-echo.com",
   "license": "MIT",
   "private": false,
   "scripts": {
@@ -16,6 +16,7 @@
     "ajv": "^6.9.1",
     "autoprefixer": "^7.2.5",
     "babel-core": "^6.26.0",
+    "babel-eslint": "^10.0.2",
     "babel-loader": "^7.1.2",
     "babel-minify-webpack-plugin": "^0.2.0",
     "babel-plugin-transform-class-properties": "^6.24.1",
@@ -28,12 +29,16 @@
     "cross-env": "^5.1.3",
     "css-loader": "^0.28.9",
     "cssnano": "^3.10.0",
-    "eslint": "^5.13.0",
+    "eslint": "^5",
+    "eslint-config-airbnb": "^18.0.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.16.0",
-    "eslint-plugin-vue": "^5.1.0",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
+    "eslint-plugin-react": "^7.14.3",
+    "eslint-plugin-react-hooks": "^1.7.0",
+    "eslint-plugin-vue": "^5.2.3",
     "extract-text-webpack-plugin": "^3.0.2",
-    "file-loader": "^1.1.6",
+    "file-loader": "~2",
     "import-glob": "^1.5.0",
     "node-sass": "^4.9.2",
     "optimize-css-assets-webpack-plugin": "^3.2.0",
@@ -50,12 +55,14 @@
     "uglify-js": "^3.3.9",
     "uglifyjs-webpack-plugin": "^1.1.8",
     "url-loader": "^0.6.2",
+    "vue-eslint-parser": "^6.0.4",
     "vue-loader": "^14.1.0",
     "vue-template-compiler": "^2.6.6",
     "webpack": "^3.12.0"
   },
   "dependencies": {
     "blazy": "^1.8.2",
-    "jquery": "^3.3.1"
+    "jquery": "^3.3.1",
+    "siema": "^1.5.1"
   }
 }
